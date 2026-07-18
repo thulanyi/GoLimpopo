@@ -6,11 +6,10 @@ import sqlite3
 import smtplib
 import ssl
 import time
-import imghdr
 import logging
 import hashlib
 from io import StringIO
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict, deque
 from functools import wraps
 from email.message import EmailMessage
@@ -93,6 +92,16 @@ if PAYFAST_SANDBOX and not PAYFAST_MERCHANT_KEY:
 PAYFAST_SIGN_REQUESTS = env_flag("PAYFAST_SIGN_REQUESTS", False)
 PAYFAST_TEST_MODE_FALLBACK = env_flag("PAYFAST_TEST_MODE_FALLBACK", True)
 PUBLIC_BASE_URL = os.environ.get("MAGAYISA_PUBLIC_BASE_URL", "").rstrip("/")
+
+
+def detect_image_type(header):
+    if header.startswith(b"\xff\xd8\xff"):
+        return "jpeg"
+    if header.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "png"
+    if header.startswith(b"RIFF") and header[8:12] == b"WEBP":
+        return "webp"
+    return None
 
 logging.basicConfig(level=logging.INFO if IS_PRODUCTION else logging.DEBUG)
 logger = logging.getLogger("magayisa")
@@ -1023,7 +1032,7 @@ def save_profile_photo(photo_file):
 
     header = photo_file.stream.read(512)
     photo_file.stream.seek(0)
-    detected = imghdr.what(None, h=header)
+    detected = detect_image_type(header)
     if detected not in UPLOAD_ALLOWED_TYPES:
         flash("Please upload JPG, PNG, or WEBP images only.", "danger")
         return None
@@ -1282,7 +1291,9 @@ def payments_for_admin():
 
 
 def driver_period_stats(driver_id, days):
-    lookback = f"-{max(days - 1, 0)} days"
+    cutoff_date = (
+        datetime.utcnow().date() - timedelta(days=max(days - 1, 0))
+    ).isoformat()
     row = query_one(
         """
         SELECT
@@ -1298,9 +1309,9 @@ def driver_period_stats(driver_id, days):
         LEFT JOIN payments ON payments.booking_id = bookings.id
         WHERE trips.driver_id = ?
           AND trips.status = 'completed'
-          AND DATE(trips.travel_date) >= DATE('now', ?)
+                    AND trips.travel_date >= ?
         """,
-        (driver_id, lookback),
+                (driver_id, cutoff_date),
     )
     avg_rating = row["average_rating"]
     return {
@@ -2004,8 +2015,8 @@ def driver_dashboard():
         SELECT *
         FROM trips
         WHERE driver_id = ?
-          AND DATE(travel_date) >= DATE(?)
-          AND DATE(travel_date) <= DATE(?)
+                    AND travel_date >= ?
+                    AND travel_date <= ?
         ORDER BY travel_date DESC, travel_time DESC
         """,
         (user["id"], start_date.isoformat(), end_date.isoformat()),
@@ -2489,11 +2500,11 @@ def export_payouts_csv():
     filters = []
     params = []
     if start_date:
-        filters.append("DATE(payments.created_at) >= DATE(?)")
-        params.append(start_date.isoformat())
+        filters.append("payments.created_at >= ?")
+        params.append(f"{start_date.isoformat()}T00:00:00")
     if end_date:
-        filters.append("DATE(payments.created_at) <= DATE(?)")
-        params.append(end_date.isoformat())
+        filters.append("payments.created_at < ?")
+        params.append(f"{(end_date + timedelta(days=1)).isoformat()}T00:00:00")
     if payout_status != "all":
         filters.append("payments.payout_status = ?")
         params.append(payout_status)
@@ -2620,6 +2631,8 @@ def export_daily_reconciliation_csv():
     if target_date is None:
         target_date = datetime.utcnow().date()
     target_date_iso = target_date.isoformat()
+    start_ts = f"{target_date_iso}T00:00:00"
+    end_ts = f"{(target_date + timedelta(days=1)).isoformat()}T00:00:00"
 
     rows = query_all(
         """
@@ -2644,10 +2657,11 @@ def export_daily_reconciliation_csv():
         JOIN trips ON trips.id = bookings.trip_id
         JOIN users AS passenger ON passenger.id = bookings.passenger_id
         JOIN users AS driver ON driver.id = trips.driver_id
-        WHERE DATE(payments.created_at) = DATE(?)
+                WHERE payments.created_at >= ?
+                    AND payments.created_at < ?
         ORDER BY payments.created_at ASC
         """,
-        (target_date_iso,),
+                (start_ts, end_ts),
     )
 
     paid_total = 0.0
