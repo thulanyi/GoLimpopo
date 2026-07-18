@@ -80,4 +80,3 @@ databases:
   - name: magayisa-postgres
     databaseName: magayisa
     user: magayisa
-    plan: starter
