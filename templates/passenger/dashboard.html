@@ -1,0 +1,90 @@
+﻿{% extends "base.html" %}
+{% block title %}Passenger dashboard | Magayisa{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1">Passenger dashboard</h1>
+    <p class="text-muted mb-0">Find trips, manage bookings, and keep an eye on confirmations.</p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-outline-secondary" href="{{ url_for('passenger_profile') }}">Update profile</a>
+    <a class="btn btn-primary" href="{{ url_for('trips_list') }}">Browse trips</a>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-wrap gap-3 align-items-center">
+      <div class="rounded-circle overflow-hidden bg-body-secondary flex-shrink-0" style="width: 84px; height: 84px;">
+        {% if current_user.passenger_photo %}
+        <img src="{{ url_for('static', filename=current_user.passenger_photo) }}" alt="{{ current_user.name }}" class="w-100 h-100 object-fit-cover">
+        {% endif %}
+      </div>
+      <div class="flex-grow-1">
+        <h2 class="h5 fw-bold mb-1">{{ current_user.name }}</h2>
+        <p class="text-muted mb-1">{{ current_user.contact_info or 'No contact information added yet.' }}</p>
+        <div class="small text-muted">
+          <strong class="text-body">Photo:</strong> {% if current_user.passenger_photo %}Added{% else %}Not added yet{% endif %}
+        </div>
+      </div>
+      <a class="btn btn-outline-primary" href="{{ url_for('passenger_profile') }}">Complete profile</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Bookings</span><h2 class="h3 mb-0">{{ bookings|length }}</h2></div></div></div>
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Trips available</span><h2 class="h3 mb-0">{{ available|length }}</h2></div></div></div>
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Unread notifications</span><h2 class="h3 mb-0">{{ unread_notifications }}</h2></div></div></div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">My bookings</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Trip</th><th>Date</th><th>Pickup</th><th>Seats</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr>
+            <td>{{ booking.route }}</td>
+            <td>{{ booking.travel_date }} {{ booking.travel_time }}</td>
+            <td>{{ booking.pickup_location }}</td>
+            <td>{{ booking.seats }}</td>
+            <td>{{ booking.booking_status|title }}</td>
+            <td class="text-nowrap">
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('booking_detail', booking_id=booking.id) }}">Receipt</a>
+              <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('track_trip', booking_id=booking.id) }}">Track</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="text-muted">No bookings yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Recent open trips</h2>
+    <div class="row g-3">
+      {% for trip in available[:4] %}
+      <div class="col-md-6 col-xl-3">
+        <div class="mini-card">
+          {% set scenic = 'mountain-route.svg' if loop.index0 % 2 == 0 else 'city-drive.svg' %}
+          <img src="{{ url_for('static', filename=scenic) }}" alt="Trip picture" class="mini-card-photo mb-2">
+          <strong>{{ trip.route }}</strong>
+          <div class="text-muted small">{{ trip.travel_date }} at {{ trip.travel_time }}</div>
+          <div class="small">{{ trip.available_seats }} seats left</div>
+          <a href="{{ url_for('trip_detail', trip_id=trip.id) }}">Book now</a>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-12 text-muted">No trips available right now.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

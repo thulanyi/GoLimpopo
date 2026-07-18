@@ -1,0 +1,254 @@
+﻿{% extends "base.html" %}
+{% block title %}Driver dashboard | Magayisa{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1">Driver dashboard</h1>
+    <p class="text-muted mb-0">Post trips, manage bookings, and keep passengers informed.</p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-outline-secondary" href="{{ url_for('driver_profile') }}">Update profile</a>
+    <a class="btn btn-primary" href="{{ url_for('create_trip') }}">Post trip</a>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-wrap gap-3 align-items-center">
+      <div class="rounded-circle overflow-hidden bg-body-secondary flex-shrink-0" style="width: 84px; height: 84px;">
+        {% if current_user.driver_photo %}
+        <img src="{{ url_for('static', filename=current_user.driver_photo) }}" alt="{{ current_user.name }}" class="w-100 h-100 object-fit-cover">
+        {% endif %}
+      </div>
+      <div class="flex-grow-1">
+        <h2 class="h5 fw-bold mb-1">{{ current_user.name }}</h2>
+        <p class="text-muted mb-1">{{ current_user.contact_info or 'No contact information added yet.' }}</p>
+        <div class="d-flex flex-wrap align-items-center gap-3">
+          <img src="{{ url_for('static', filename='car-thumb.svg') }}" alt="Car description" class="car-thumb">
+          <div class="small text-muted">
+          <span class="me-3"><strong class="text-body">Reg:</strong> {{ current_user.vehicle_registration or 'Not provided' }}</span>
+          <span class="me-3"><strong class="text-body">Type:</strong> {{ current_user.vehicle_type or 'Not provided' }}</span>
+          <span><strong class="text-body">Colour:</strong> {{ current_user.vehicle_color or 'Not provided' }}</span>
+          </div>
+        </div>
+      </div>
+      <a class="btn btn-outline-primary" href="{{ url_for('driver_profile') }}">Complete profile</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Active trips</span><h2 class="h3 mb-0">{{ active_trips|length }}</h2></div></div></div>
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Trip history</span><h2 class="h3 mb-0">{{ history_trips|length }}</h2></div></div></div>
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Bookings received</span><h2 class="h3 mb-0">{{ bookings|length }}</h2></div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Unread notifications</span><h2 class="h3 mb-0">{{ unread_notifications }}</h2></div></div></div>
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Payout pending</span><h2 class="h3 mb-0">{{ payout_summary.pending_amount|currency }}</h2></div></div></div>
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Payouts paid</span><h2 class="h3 mb-0">{{ payout_summary.paid_amount|currency }}</h2></div></div></div>
+</div>
+
+<div class="card app-card mb-4 overflow-hidden">
+  <img src="{{ url_for('static', filename='mountain-route.svg') }}" alt="Route picture" class="trip-card-photo">
+  <div class="card-body">
+    <h2 class="h5 fw-bold mb-1">Ready for your next route</h2>
+    <p class="text-muted mb-0">Keep your vehicle details updated and publish a trip when you are ready to drive.</p>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <h2 class="h4 fw-bold mb-0">Performance stats</h2>
+      <span class="badge text-bg-info">Platform commission {{ commission_percent }}%</span>
+    </div>
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="card border-0 bg-body-tertiary h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3 class="h5 mb-0">Last 7 days</h3>
+              <span class="badge text-bg-primary">Week</span>
+            </div>
+            <div class="row g-3 small">
+              <div class="col-6"><span class="text-muted">Trips completed</span><div class="fw-semibold fs-5">{{ weekly_stats.trips_completed }}</div></div>
+              <div class="col-6"><span class="text-muted">Seats sold</span><div class="fw-semibold fs-5">{{ weekly_stats.seats_booked }}</div></div>
+              <div class="col-6"><span class="text-muted">Driver net earnings</span><div class="fw-semibold fs-5">{{ weekly_stats.driver_net_earnings|currency }}</div></div>
+              <div class="col-6"><span class="text-muted">Average rating</span><div class="fw-semibold fs-5">{{ weekly_stats.average_rating if weekly_stats.average_rating is not none else 'No ratings' }}</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card border-0 bg-body-tertiary h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3 class="h5 mb-0">Last 30 days</h3>
+              <span class="badge text-bg-success">Month</span>
+            </div>
+            <div class="row g-3 small">
+              <div class="col-6"><span class="text-muted">Trips completed</span><div class="fw-semibold fs-5">{{ monthly_stats.trips_completed }}</div></div>
+              <div class="col-6"><span class="text-muted">Seats sold</span><div class="fw-semibold fs-5">{{ monthly_stats.seats_booked }}</div></div>
+              <div class="col-6"><span class="text-muted">Driver net earnings</span><div class="fw-semibold fs-5">{{ monthly_stats.driver_net_earnings|currency }}</div></div>
+              <div class="col-6"><span class="text-muted">Average rating</span><div class="fw-semibold fs-5">{{ monthly_stats.average_rating if monthly_stats.average_rating is not none else 'No ratings' }}</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+      <h2 class="h4 fw-bold mb-0">Custom trip view</h2>
+      <span class="text-muted small">Choose any date range to view your trips.</span>
+    </div>
+
+    <form method="get" action="{{ url_for('driver_dashboard') }}" class="row g-3 align-items-end mb-4">
+      <div class="col-md-4">
+        <label class="form-label">Start date</label>
+        <input class="form-control" type="date" name="start_date" value="{{ start_date }}" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">End date</label>
+        <input class="form-control" type="date" name="end_date" value="{{ end_date }}" required>
+      </div>
+      <div class="col-md-4 d-flex gap-2">
+        <button class="btn btn-primary w-100" type="submit">Apply view</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('driver_dashboard') }}">Reset</a>
+      </div>
+    </form>
+
+    <div class="row g-3 mb-3">
+      <div class="col-sm-3"><div class="border rounded-4 p-3"><span class="text-muted small">Trips in view</span><div class="h4 mb-0">{{ filtered_summary.total }}</div></div></div>
+      <div class="col-sm-3"><div class="border rounded-4 p-3"><span class="text-muted small">Open</span><div class="h4 mb-0">{{ filtered_summary.open }}</div></div></div>
+      <div class="col-sm-3"><div class="border rounded-4 p-3"><span class="text-muted small">Completed</span><div class="h4 mb-0">{{ filtered_summary.completed }}</div></div></div>
+      <div class="col-sm-3"><div class="border rounded-4 p-3"><span class="text-muted small">Cancelled</span><div class="h4 mb-0">{{ filtered_summary.cancelled }}</div></div></div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Route</th><th>Date</th><th>Time</th><th>Seats</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for trip in filtered_trips %}
+          <tr>
+            <td>{{ trip.route }}</td>
+            <td>{{ trip.travel_date }}</td>
+            <td>{{ trip.travel_time }}</td>
+            <td>{{ trip.available_seats }}</td>
+            <td>
+              {% if trip.status == 'open' %}
+              <span class="badge text-bg-primary">Open</span>
+              {% elif trip.status == 'completed' %}
+              <span class="badge text-bg-success">Completed</span>
+              {% else %}
+              <span class="badge text-bg-secondary">Cancelled</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-muted">No trips found for this date range.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Active trips</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Route</th><th>Date</th><th>Seats</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for trip in active_trips %}
+          <tr>
+            <td>{{ trip.route }}</td>
+            <td>{{ trip.travel_date }} {{ trip.travel_time }}</td>
+            <td>{{ trip.available_seats }}</td>
+            <td><span class="badge text-bg-primary">New / Open</span></td>
+            <td class="text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('edit_trip', trip_id=trip.id) }}">Edit</a>
+              <form class="d-inline" method="post" action="{{ url_for('close_trip', trip_id=trip.id) }}" onsubmit="return confirm('Mark this trip as completed and email receipts to passengers?');">
+                <button class="btn btn-sm btn-outline-success" type="submit">Close trip</button>
+              </form>
+              <form class="d-inline" method="post" action="{{ url_for('cancel_trip', trip_id=trip.id) }}" onsubmit="return confirm('Cancel this trip?');">
+                <button class="btn btn-sm btn-outline-danger" type="submit">Cancel</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-muted">No active trips right now.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Trip history</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Route</th><th>Date</th><th>Final seats</th><th>Status</th><th>Flag</th></tr></thead>
+        <tbody>
+          {% for trip in history_trips %}
+          <tr>
+            <td>{{ trip.route }}</td>
+            <td>{{ trip.travel_date }} {{ trip.travel_time }}</td>
+            <td>{{ trip.available_seats }}</td>
+            <td>{{ trip.status|title }}</td>
+            <td><span class="badge text-bg-secondary">History</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-muted">No completed or cancelled trips yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Bookings on my trips</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Passenger</th><th>Cellphone</th><th>Trip</th><th>Seats</th><th>Payment</th><th>Chat</th><th></th></tr></thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr>
+            <td>{{ booking.passenger_name }}</td>
+            <td>{{ booking.passenger_contact or 'Not provided' }}</td>
+            <td>{{ booking.route }}</td>
+            <td>{{ booking.seats }}</td>
+            <td>{{ booking.payment_status|title }}</td>
+            <td>
+              {% if booking.booking_status != 'cancelled' %}
+              <form method="post" action="{{ url_for('send_booking_message', booking_id=booking.id) }}" class="d-flex gap-2">
+                <input class="form-control form-control-sm" type="text" name="message" maxlength="1000" placeholder="Message passenger" required>
+                <button class="btn btn-sm btn-primary" type="submit">Send</button>
+              </form>
+              {% else %}
+              <span class="text-muted small">Chat unavailable</span>
+              {% endif %}
+            </td>
+            <td class="text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('booking_detail', booking_id=booking.id) }}#chat-panel">Open chat</a>
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('booking_detail', booking_id=booking.id) }}">Details</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="text-muted">No bookings yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

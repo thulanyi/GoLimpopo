@@ -1,0 +1,13 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ title }} - Magayisa{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card app-card p-4 p-lg-5 text-center">
+      <h1 class="display-6 fw-bold mb-3">{{ title }}</h1>
+      <p class="lead text-muted mb-4">{{ message }}</p>
+      <a class="btn btn-primary" href="{{ url_for('index') }}">Return home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

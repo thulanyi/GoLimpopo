@@ -1,0 +1,24 @@
+﻿{% extends "base.html" %}
+{% block title %}Passenger profile | Magayisa{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card app-card p-4 p-lg-5">
+      <h1 class="h3 fw-bold mb-3">Update passenger profile</h1>
+      <p class="text-muted mb-4">Add a photo so drivers can identify you more easily when you board.</p>
+      <form method="post" enctype="multipart/form-data" class="vstack gap-3">
+        <div>
+          <label class="form-label">Contact information</label>
+          <input class="form-control" type="text" name="contact_info" value="{{ user.contact_info or '' }}" placeholder="Phone number or WhatsApp">
+        </div>
+        <div>
+          <label class="form-label">Passenger photo</label>
+          <input class="form-control" type="file" name="passenger_photo" accept="image/*">
+          <div class="form-text">If you leave this blank, your current photo stays in place.</div>
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Save profile</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

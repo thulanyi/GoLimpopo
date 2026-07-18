@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Mountain route</title>
+  <desc id="desc">Stylized mountain road with route pin</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <polygon points="120,410 320,180 500,410" fill="#0b3b31" opacity="0.85"/>
+  <polygon points="340,410 560,150 800,410" fill="#134e4a" opacity="0.95"/>
+  <polygon points="416,320 470,254 526,320" fill="#ecfeff" opacity="0.9"/>
+  <path d="M0 470 C180 430 300 490 430 462 C560 434 700 462 960 430 L960 540 L0 540 Z" fill="#14532d"/>
+  <path d="M420 540 C420 450 470 430 530 380 C560 354 582 320 590 290 C560 314 520 326 492 320 C448 310 406 282 380 240 C360 298 330 340 285 370 C220 416 170 450 170 540 Z" fill="#1f2937"/>
+  <path d="M322 540 C322 470 364 442 420 402" stroke="#f8fafc" stroke-width="7" stroke-dasharray="16 12" fill="none"/>
+  <g transform="translate(548 206)">
+    <path d="M32 0C14 0 0 14 0 32c0 23 32 58 32 58s32-35 32-58C64 14 50 0 32 0z" fill="#f97316"/>
+    <circle cx="32" cy="32" r="11" fill="#fff"/>
+  </g>
+</svg>

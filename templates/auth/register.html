@@ -1,0 +1,90 @@
+﻿{% extends "base.html" %}
+{% block title %}Register | Magayisa{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card app-card p-4 p-lg-5">
+      <h1 class="h3 fw-bold mb-3">Create your account</h1>
+      <p class="text-muted mb-4">Passengers and drivers can both register. Driver documents are captured during sign-up.</p>
+      <form method="post" enctype="multipart/form-data" class="vstack gap-3" id="register-form">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Full name</label>
+            <input class="form-control" type="text" name="name" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input class="form-control" type="email" name="email" required>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Password</label>
+            <input class="form-control" type="password" name="password" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Account type</label>
+            <select class="form-select" name="role" id="role-select">
+              <option value="passenger">Passenger</option>
+              <option value="driver">Driver</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Contact information</label>
+          <input class="form-control" type="text" name="contact_info" placeholder="Phone number or WhatsApp">
+        </div>
+        <div>
+          <label class="form-label">Passenger photo</label>
+          <input class="form-control" type="file" name="passenger_photo" accept="image/*">
+          <div class="form-text">Passengers can add a photo now and update it later from their profile page.</div>
+        </div>
+        <div id="driver-fields" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Government ID</label>
+            <input class="form-control" type="text" name="government_id" placeholder="Required for drivers only">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Driver photo</label>
+            <input class="form-control" type="file" name="driver_photo" accept="image/*">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Vehicle registration</label>
+            <input class="form-control" type="text" name="vehicle_registration" placeholder="Plate number">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Vehicle type</label>
+            <input class="form-control" type="text" name="vehicle_type" placeholder="Toyota Avanza, VW Polo Vivo">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Vehicle colour</label>
+            <input class="form-control" type="text" name="vehicle_color" placeholder="White, silver, black">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Vehicle details</label>
+            <input class="form-control" type="text" name="vehicle_details" placeholder="Make, model, extra notes">
+          </div>
+        </div>
+        <div class="alert alert-info mb-0">
+          Driver details are stored securely and reviewed by admins before verification.
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Register</button>
+      </form>
+      <p class="text-muted mt-3 mb-0">Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const roleSelect = document.getElementById('role-select');
+  const driverFields = document.getElementById('driver-fields');
+  function syncDriverFields() {
+    const isDriver = roleSelect.value === 'driver';
+    driverFields.querySelectorAll('input').forEach((input) => input.required = isDriver);
+    driverFields.style.display = isDriver ? 'flex' : 'none';
+  }
+  roleSelect.addEventListener('change', syncDriverFields);
+  syncDriverFields();
+</script>
+{% endblock %}

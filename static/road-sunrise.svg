@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Sunrise road</title>
+  <desc id="desc">Stylized sunrise over a highway landscape</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b1736"/>
+      <stop offset="55%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#fb923c"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#sky)"/>
+  <circle cx="735" cy="140" r="64" fill="#fcd34d" opacity="0.9"/>
+  <path d="M0 355 C180 315 300 360 465 338 C615 320 760 260 960 300 L960 540 L0 540 Z" fill="#14532d" opacity="0.75"/>
+  <path d="M390 540 L450 250 L510 250 L570 540 Z" fill="url(#road)"/>
+  <rect x="474" y="280" width="12" height="28" fill="#f8fafc"/>
+  <rect x="474" y="330" width="12" height="32" fill="#f8fafc"/>
+  <rect x="474" y="386" width="12" height="38" fill="#f8fafc"/>
+  <rect x="474" y="452" width="12" height="52" fill="#f8fafc"/>
+</svg>

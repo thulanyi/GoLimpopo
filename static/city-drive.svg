@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">City drive</title>
+  <desc id="desc">Stylized city skyline and a car at night</desc>
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#night)"/>
+  <g fill="#334155">
+    <rect x="70" y="160" width="92" height="210"/>
+    <rect x="178" y="118" width="84" height="252"/>
+    <rect x="276" y="182" width="128" height="188"/>
+    <rect x="422" y="148" width="110" height="222"/>
+    <rect x="548" y="196" width="96" height="174"/>
+    <rect x="666" y="132" width="104" height="238"/>
+    <rect x="786" y="178" width="82" height="192"/>
+  </g>
+  <g fill="#fcd34d" opacity="0.9">
+    <rect x="88" y="184" width="10" height="12"/><rect x="108" y="184" width="10" height="12"/>
+    <rect x="196" y="146" width="10" height="12"/><rect x="216" y="146" width="10" height="12"/>
+    <rect x="304" y="210" width="10" height="12"/><rect x="324" y="210" width="10" height="12"/>
+    <rect x="452" y="176" width="10" height="12"/><rect x="472" y="176" width="10" height="12"/>
+    <rect x="696" y="162" width="10" height="12"/><rect x="716" y="162" width="10" height="12"/>
+  </g>
+  <rect x="0" y="370" width="960" height="170" fill="#111827"/>
+  <rect x="0" y="430" width="960" height="10" fill="#f8fafc" opacity="0.4"/>
+  <g transform="translate(310 320)">
+    <rect x="90" y="80" width="250" height="52" rx="18" fill="url(#car)"/>
+    <path d="M135 80h130l36-36h-110c-16 0-32 8-42 22z" fill="url(#car)"/>
+    <rect x="190" y="52" width="70" height="20" rx="4" fill="#dbeafe"/>
+    <circle cx="140" cy="136" r="24" fill="#020617"/>
+    <circle cx="292" cy="136" r="24" fill="#020617"/>
+    <circle cx="140" cy="136" r="10" fill="#94a3b8"/>
+    <circle cx="292" cy="136" r="10" fill="#94a3b8"/>
+  </g>
+</svg>

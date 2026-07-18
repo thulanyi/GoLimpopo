@@ -1,0 +1,35 @@
+﻿{% extends "base.html" %}
+{% block title %}Rate your trip | Magayisa{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card app-card p-4 p-lg-5">
+      <span class="badge text-bg-success mb-3">Trip feedback</span>
+      <h1 class="h3 fw-bold mb-2">Rate your ride with {{ booking.driver_name }}</h1>
+      <p class="text-muted mb-4">Your feedback helps us keep the service safe and reliable.</p>
+      <div class="alert alert-light border mb-4">
+        <strong>{{ booking.route }}</strong><br>
+        {{ booking.travel_date }} at {{ booking.travel_time }}<br>
+        Pickup: {{ booking.pickup_location }}
+      </div>
+      <form method="post" class="vstack gap-3">
+        <div>
+          <label class="form-label">Service rating</label>
+          <select class="form-select" name="rating_score" required>
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Good</option>
+            <option value="3">3 - Fair</option>
+            <option value="2">2 - Poor</option>
+            <option value="1">1 - Very poor</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Comments</label>
+          <textarea class="form-control" name="rating_comment" rows="4" placeholder="Tell us what went well or what we can improve."></textarea>
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Submit rating</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

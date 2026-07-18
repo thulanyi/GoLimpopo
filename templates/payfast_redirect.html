@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}PayFast checkout | Magayisa{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card app-card p-4 p-lg-5">
+      <h1 class="h3 fw-bold mb-2">Redirecting to PayFast</h1>
+      <p class="text-muted mb-4">
+        You are being redirected to PayFast secure checkout for booking #{{ booking.id }}.
+      </p>
+      <form id="payfast-checkout-form" method="post" action="{{ payfast_url }}">
+        {% for key, value in payload.items() %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endfor %}
+        <button class="btn btn-primary" type="submit">Continue to PayFast</button>
+        <a class="btn btn-outline-secondary ms-2" href="{{ url_for('booking_detail', booking_id=booking.id) }}">Back to booking</a>
+      </form>
+      <p class="small text-muted mt-3 mb-0">If automatic redirection does not start, click "Continue to PayFast".</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  setTimeout(() => {
+    const form = document.getElementById('payfast-checkout-form');
+    if (form) {
+      form.submit();
+    }
+  }, 300);
+</script>
+{% endblock %}

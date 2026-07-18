@@ -1,0 +1,159 @@
+﻿{% extends "base.html" %}
+{% block title %}Receipt | Magayisa{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card app-card p-4 p-lg-5">
+      <div class="d-flex justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+          <span class="badge text-bg-success mb-2">Confirmed</span>
+          <h1 class="h3 fw-bold mb-1">Receipt {{ booking.receipt_number }}</h1>
+          <p class="text-muted mb-0">Payment reference {{ booking.payment_reference }}</p>
+        </div>
+        <div class="text-lg-end">
+          <p class="mb-1"><strong>{{ booking.route }}</strong></p>
+          <p class="mb-0 text-muted">{{ booking.travel_date }} at {{ booking.travel_time }}</p>
+        </div>
+      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-md-4"><div class="info-box"><span>Passenger</span><strong>{{ booking.passenger_name }}</strong></div></div>
+        <div class="col-md-4"><div class="info-box"><span>Driver</span><strong>{{ booking.driver_name }}</strong></div></div>
+        <div class="col-md-4"><div class="info-box"><span>Seats</span><strong>{{ booking.seats }}</strong></div></div>
+      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6"><div class="info-box"><span>Passenger cellphone</span><strong>{{ booking.passenger_contact or 'Not provided' }}</strong></div></div>
+        <div class="col-md-6"><div class="info-box"><span>Driver cellphone</span><strong>{{ booking.driver_contact or 'Not provided' }}</strong></div></div>
+      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6"><div class="info-box"><span>Pickup location</span><strong>{{ booking.pickup_location }}</strong></div></div>
+        <div class="col-md-6"><div class="info-box"><span>Trip tracking</span><strong>Share link ready</strong></div></div>
+      </div>
+      <div class="row g-3 mb-4 align-items-stretch">
+        <div class="col-md-4">
+          <div class="card border-0 bg-body-tertiary h-100">
+            <div class="card-body text-center">
+              <div class="rounded-circle overflow-hidden bg-body-secondary mx-auto mb-3" style="width: 112px; height: 112px;">
+                {% if booking.driver_photo %}
+                <img src="{{ url_for('static', filename=booking.driver_photo) }}" alt="{{ booking.driver_name }}" class="w-100 h-100 object-fit-cover">
+                {% endif %}
+              </div>
+              <div class="fw-semibold">{{ booking.driver_name }}</div>
+              <div class="text-muted small">{{ booking.driver_contact or 'Not provided' }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="card border-0 bg-body-tertiary h-100">
+            <div class="card-body">
+              <h2 class="h5 fw-bold mb-3">Driver and vehicle details</h2>
+              <div class="row g-3 small text-muted">
+                <div class="col-md-6"><strong class="text-body">Car registration:</strong> {{ booking.vehicle_registration or 'Not provided' }}</div>
+                <div class="col-md-6"><strong class="text-body">Car type:</strong> {{ booking.vehicle_type or 'Not provided' }}</div>
+                <div class="col-md-6"><strong class="text-body">Colour:</strong> {{ booking.vehicle_color or 'Not provided' }}</div>
+                <div class="col-md-6"><strong class="text-body">Vehicle notes:</strong> {{ booking.vehicle_details or 'Not provided' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-light border">
+        Booking status: <strong>{{ booking.booking_status|title }}</strong><br>
+        Payment status: <strong>{{ booking.payment_status|title }}</strong><br>
+        Method: <strong>{{ booking.payment_method }}</strong>
+      </div>
+      <div class="card border-0 bg-body-tertiary mb-4">
+        <div class="card-body">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h2 class="h5 fw-bold mb-0">Payment details</h2>
+            <div class="d-flex flex-wrap gap-2">
+              {% if payment and payment.provider == 'PayFast' and payment.status != 'paid' %}
+              <a class="btn btn-sm btn-primary" href="{{ url_for('start_payfast_checkout', booking_id=booking.id) }}">Pay with PayFast</a>
+              {% endif %}
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('booking_payment', booking_id=booking.id) }}">Add or update payment details</a>
+            </div>
+          </div>
+          {% if payment and payment.payment_type %}
+          <div class="row g-3 small text-muted">
+            {% if payment.payment_type == 'card' %}
+            <div class="col-md-6"><strong class="text-body">Card brand:</strong> {{ payment.card_brand or 'Card' }}</div>
+            <div class="col-md-6"><strong class="text-body">Cardholder:</strong> {{ payment.cardholder_name or 'Not provided' }}</div>
+            <div class="col-md-6"><strong class="text-body">Card last 4:</strong> {{ payment.card_last4 or 'Not provided' }}</div>
+            <div class="col-md-6"><strong class="text-body">Expiry:</strong> {{ payment.card_expiry_month or '--' }}/{{ payment.card_expiry_year or '----' }}</div>
+            {% else %}
+            <div class="col-md-6"><strong class="text-body">Bank name:</strong> {{ payment.bank_name or 'Not provided' }}</div>
+            <div class="col-md-6"><strong class="text-body">Account name:</strong> {{ payment.bank_account_name or 'Not provided' }}</div>
+            <div class="col-md-6"><strong class="text-body">Account last 4:</strong> {{ payment.bank_account_last4 or 'Not provided' }}</div>
+            {% endif %}
+          </div>
+          {% else %}
+          <p class="text-muted mb-0">No payment details have been added yet.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card border-0 bg-body-tertiary mb-4">
+        <div class="card-body">
+          <label class="form-label">Share this trip with friends</label>
+          <div class="input-group">
+            <input id="share-url" class="form-control" type="text" value="{{ share_url }}" readonly>
+            <button class="btn btn-outline-primary" type="button" id="copy-share-url">Copy link</button>
+          </div>
+          <div class="form-text">Friends can open the link to see pickup details and live trip status without logging in.</div>
+          <div class="mt-3 d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary" href="{{ url_for('track_trip', booking_id=booking.id) }}">Track trip</a>
+            <a class="btn btn-outline-primary" href="https://wa.me/?text={{ share_url|urlencode }}" target="_blank" rel="noreferrer">Share on WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 bg-body-tertiary mb-4" id="chat-panel">
+        <div class="card-body">
+          <h2 class="h5 fw-bold mb-3">In-app chat</h2>
+          <div class="chat-thread mb-3">
+            {% for item in chat_messages %}
+            {% set is_mine = item.sender_id == current_user.id %}
+            <div class="chat-row {% if is_mine %}chat-row--out{% else %}chat-row--in{% endif %}">
+              <div class="chat-bubble {% if is_mine %}chat-bubble--out{% else %}chat-bubble--in{% endif %}">
+                <div class="chat-text">{{ item.message }}</div>
+                <div class="chat-meta">
+                  {% if is_mine %}You{% else %}{{ item.sender_name }}{% endif %} · {{ item.created_at }}
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="chat-empty">No messages yet. Start the conversation here.</div>
+            {% endfor %}
+          </div>
+          <form method="post" action="{{ url_for('send_booking_message', booking_id=booking.id) }}" class="chat-compose">
+            <input class="form-control chat-compose-input" type="text" name="message" placeholder="Type your message" maxlength="1000" required>
+            <button class="btn btn-primary chat-compose-send" type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+
+      <form class="mt-4" method="post" action="{{ url_for('raise_dispute', booking_id=booking.id) }}">
+        <label class="form-label">Raise a dispute</label>
+        <textarea class="form-control mb-3" name="reason" rows="3" placeholder="Describe the issue"></textarea>
+        <button class="btn btn-outline-danger" type="submit">Submit dispute</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const copyButton = document.getElementById('copy-share-url');
+  const shareField = document.getElementById('share-url');
+  if (copyButton && shareField) {
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareField.value);
+        copyButton.textContent = 'Copied';
+        setTimeout(() => { copyButton.textContent = 'Copy link'; }, 1800);
+      } catch (error) {
+        shareField.select();
+        document.execCommand('copy');
+      }
+    });
+  }
+</script>
+{% endblock %}

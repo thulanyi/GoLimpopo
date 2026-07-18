@@ -1,0 +1,258 @@
+﻿{% extends "base.html" %}
+{% block title %}Admin dashboard | Magayisa{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1">Admin dashboard</h1>
+    <p class="text-muted mb-0">Verify drivers and oversee bookings, payments, and disputes.</p>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Drivers pending review</span><h2 class="h3 mb-0">{{ pending_drivers|selectattr('is_verified', 'equalto', 0)|list|length }}</h2></div></div></div>
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Bookings</span><h2 class="h3 mb-0">{{ bookings|length }}</h2></div></div></div>
+  <div class="col-md-4"><div class="card app-card"><div class="card-body"><span class="text-muted">Open disputes</span><h2 class="h3 mb-0">{{ disputes|selectattr('status', 'equalto', 'open')|list|length }}</h2></div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-5">
+    <div class="card app-card h-100">
+      <div class="card-body">
+        <h2 class="h5 fw-bold mb-3">Commission setting</h2>
+        <form method="post" action="{{ url_for('update_commission_setting') }}" class="d-flex flex-wrap gap-2 align-items-end">
+          <div class="flex-grow-1">
+            <label class="form-label">Platform commission (%)</label>
+            <input class="form-control" type="number" name="commission_percent" min="0" max="100" step="0.01" value="{{ commission_percent }}" required>
+          </div>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="row g-3">
+      <div class="col-sm-6"><div class="card app-card"><div class="card-body"><span class="text-muted">Platform commission earned</span><h2 class="h4 mb-0">{{ totals.platform_commission|currency }}</h2></div></div></div>
+      <div class="col-sm-6"><div class="card app-card"><div class="card-body"><span class="text-muted">Driver payouts due</span><h2 class="h4 mb-0">{{ totals.driver_payouts|currency }}</h2></div></div></div>
+      <div class="col-sm-6"><div class="card app-card"><div class="card-body"><span class="text-muted">Gross paid revenue</span><h2 class="h4 mb-0">{{ totals.gross_revenue|currency }}</h2></div></div></div>
+      <div class="col-sm-6"><div class="card app-card"><div class="card-body"><span class="text-muted">Refunded amount</span><h2 class="h4 mb-0">{{ totals.refunded_amount|currency }}</h2></div></div></div>
+      <div class="col-sm-6"><div class="card app-card"><div class="card-body"><span class="text-muted">Pending driver payouts</span><h2 class="h4 mb-0">{{ totals.pending_driver_payouts|currency }}</h2></div></div></div>
+      <div class="col-sm-6"><div class="card app-card"><div class="card-body"><span class="text-muted">Settled driver payouts</span><h2 class="h4 mb-0">{{ totals.settled_driver_payouts|currency }}</h2></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Driver verification queue</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Name</th><th>Email</th><th>ID</th><th>Vehicle</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for driver in pending_drivers %}
+          <tr>
+            <td>{{ driver.name }}</td>
+            <td>{{ driver.email }}</td>
+            <td>{{ driver.government_id or '-' }}</td>
+            <td>{{ driver.vehicle_details or '-' }}</td>
+            <td>{% if driver.is_verified %}<span class="badge text-bg-success">Verified</span>{% else %}<span class="badge text-bg-warning">Pending</span>{% endif %}</td>
+            <td>
+              {% if not driver.is_verified %}
+              <form method="post" action="{{ url_for('verify_driver', user_id=driver.id) }}">
+                <button class="btn btn-sm btn-outline-primary" type="submit">Verify</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="text-muted">No driver records yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Registered users</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Contact</th><th>Registered</th><th>Verified</th></tr></thead>
+        <tbody>
+          {% for user in registered_users %}
+          <tr>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role|title }}</td>
+            <td>{{ user.contact_info or '-' }}</td>
+            <td>{{ user.created_at }}</td>
+            <td>
+              {% if user.role == 'driver' %}
+                {% if user.is_verified %}
+                <span class="badge text-bg-success">Yes</span>
+                {% else %}
+                <span class="badge text-bg-warning">No</span>
+                {% endif %}
+              {% else %}
+              <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="text-muted">No users found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Bookings</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Passenger</th><th>Trip</th><th>Seats</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr>
+            <td>{{ booking.passenger_name }}</td>
+            <td>{{ booking.route }} <span class="text-muted">({{ booking.travel_date }})</span></td>
+            <td>{{ booking.seats }}</td>
+            <td>{{ booking.payment_status|title }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-muted">No bookings yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <h2 class="h4 fw-bold mb-0">Payments</h2>
+      <div class="d-flex flex-wrap gap-2">
+        <form class="d-flex flex-wrap gap-2 align-items-end" method="get" action="{{ url_for('export_daily_reconciliation_csv') }}">
+          <div>
+            <label class="form-label small mb-1">Reconcile date</label>
+            <input class="form-control form-control-sm" type="date" name="date" value="{{ reconciliation_date }}">
+          </div>
+          <button class="btn btn-sm btn-outline-dark" type="submit">Daily reconciliation</button>
+        </form>
+        <form class="d-flex flex-wrap gap-2 align-items-end" method="get" action="{{ url_for('export_payouts_csv') }}">
+          <div>
+            <label class="form-label small mb-1">From</label>
+            <input class="form-control form-control-sm" type="date" name="start_date">
+          </div>
+          <div>
+            <label class="form-label small mb-1">To</label>
+            <input class="form-control form-control-sm" type="date" name="end_date">
+          </div>
+          <div>
+            <label class="form-label small mb-1">Payout</label>
+            <select class="form-select form-select-sm" name="payout_status">
+              <option value="all" selected>All</option>
+              <option value="pending">Pending</option>
+              <option value="ready">Ready</option>
+              <option value="paid">Paid</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <button class="btn btn-sm btn-outline-primary" type="submit">Export CSV</button>
+        </form>
+        <form method="post" action="{{ url_for('approve_ready_payouts') }}">
+          <button class="btn btn-sm btn-outline-success" type="submit">Approve all ready payouts</button>
+        </form>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Passenger</th><th>Provider</th><th>Status</th><th>Payout</th><th>Amount</th><th>Commission</th><th>Driver net</th><th>Rate</th><th>Receipt</th><th></th></tr></thead>
+        <tbody>
+          {% for payment in payments %}
+          <tr>
+            <td>{{ payment.passenger_name }}</td>
+            <td>{{ payment.provider }}</td>
+            <td>{{ payment.status|title }}</td>
+            <td>{{ payment.payout_status|title }}</td>
+            <td>{{ payment.amount|currency }}</td>
+            <td>{{ payment.platform_commission_amount|currency }}</td>
+            <td>{{ payment.driver_net_amount|currency }}</td>
+            <td>{{ payment.commission_rate if payment.commission_rate is not none else commission_percent }}%</td>
+            <td>{{ payment.receipt_number }}</td>
+            <td>
+              {% if payment.status == 'paid' and payment.payout_status in ['pending', 'ready'] %}
+              <form method="post" action="{{ url_for('approve_payout', payment_id=payment.id) }}">
+                <button class="btn btn-sm btn-outline-success" type="submit">Mark paid</button>
+              </form>
+              {% else %}
+              <span class="text-muted small">-</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="10" class="text-muted">No payment records yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Disputes</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Passenger</th><th>Booking</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for dispute in disputes %}
+          <tr>
+            <td>{{ dispute.passenger_name }}</td>
+            <td>{{ dispute.receipt_number }}</td>
+            <td>{{ dispute.reason }}</td>
+            <td>{{ dispute.status|title }}</td>
+            <td>
+              {% if dispute.status == 'open' %}
+              <form method="post" action="{{ url_for('resolve_dispute', dispute_id=dispute.id) }}">
+                <button class="btn btn-sm btn-outline-success" type="submit">Resolve</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-muted">No disputes yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card app-card mt-4">
+  <div class="card-body">
+    <h2 class="h4 fw-bold mb-3">Payout audit log</h2>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+        <tbody>
+          {% for log in audit_logs %}
+          <tr>
+            <td>{{ log.created_at }}</td>
+            <td>{{ log.admin_name or ('Admin #' ~ log.admin_id) }}</td>
+            <td>{{ log.action.replace('_', ' ')|title }}</td>
+            <td>{{ log.target_type }}{% if log.target_id %} #{{ log.target_id }}{% endif %}</td>
+            <td class="small text-muted">{{ log.details or '-' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-muted">No audit log entries yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

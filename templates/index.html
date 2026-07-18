@@ -1,0 +1,67 @@
+﻿{% extends "base.html" %}
+{% block title %}Magayisa | Book shared trips{% endblock %}
+{% block content %}
+<section class="hero card app-card border-0 overflow-hidden mb-4">
+  <div class="card-body p-4 p-lg-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="eyebrow">Passenger, driver, and admin workflow</span>
+        <h1 class="display-5 fw-bold mt-2">Move people across Limpopo with one booking platform.</h1>
+        <p class="lead text-muted mt-3">Drivers can publish trips, passengers can book seats and pay, and admins can verify drivers and manage disputes from one dashboard.</p>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <a class="btn btn-primary btn-lg" href="{{ url_for('register') }}">Get started</a>
+          <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('trips_list') if current_user else url_for('login') }}">View trips</a>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-panel p-4">
+          <img src="{{ url_for('static', filename='road-sunrise.svg') }}" alt="Travel route" class="trip-hero-visual mb-3">
+          <div class="row g-3 text-center">
+            <div class="col-6"><div class="metric"><strong>{{ stats.drivers }}</strong><span>Drivers</span></div></div>
+            <div class="col-6"><div class="metric"><strong>{{ stats.passengers }}</strong><span>Passengers</span></div></div>
+            <div class="col-6"><div class="metric"><strong>{{ stats.trips }}</strong><span>Trips</span></div></div>
+            <div class="col-6"><div class="metric"><strong>{{ stats.bookings }}</strong><span>Bookings</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mb-4">
+  <div class="section-heading d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">Latest open trips</h2>
+    <a href="{{ url_for('trips_list') }}" class="link-secondary">Browse all</a>
+  </div>
+  <div class="row g-3">
+    {% for trip in featured_trips %}
+    <div class="col-md-6 col-xl-3">
+      <div class="card app-card h-100">
+        {% set scenic = 'city-drive.svg' if loop.index0 % 3 == 0 else ('mountain-route.svg' if loop.index0 % 3 == 1 else 'road-sunrise.svg') %}
+        <img src="{{ url_for('static', filename=scenic) }}" alt="Trip picture" class="trip-card-photo">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="badge text-bg-success">Open</span>
+            {% if trip.driver_verified %}<span class="badge text-bg-primary">Verified driver</span>{% endif %}
+          </div>
+          <h3 class="h5">{{ trip.route }}</h3>
+          <p class="text-muted mb-2">{{ trip.travel_date }} at {{ trip.travel_time }}</p>
+          <p class="mb-1">Seats left: <strong>{{ trip.available_seats }}</strong></p>
+          <p class="mb-0">{{ trip.price_per_seat|currency }} per seat</p>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <div class="card app-card"><div class="card-body text-muted">No trips have been posted yet.</div></div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="row g-3">
+  <div class="col-md-4"><div class="card app-card h-100"><div class="card-body"><h3 class="h5">Secure auth</h3><p class="text-muted mb-0">Passengers and drivers register with hashed passwords and role-based access.</p></div></div></div>
+  <div class="col-md-4"><div class="card app-card h-100"><div class="card-body"><h3 class="h5">Payments</h3><p class="text-muted mb-0">Stripe, PayFast, and Flutterwave are modeled through a payment provider field and receipt generation.</p></div></div></div>
+  <div class="col-md-4"><div class="card app-card h-100"><div class="card-body"><h3 class="h5">Admin control</h3><p class="text-muted mb-0">Admins can verify drivers, review bookings, inspect payments, and resolve disputes.</p></div></div></div>
+</section>
+{% endblock %}

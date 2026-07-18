@@ -1,0 +1,48 @@
+﻿{% extends "base.html" %}
+{% block title %}Driver profile | Magayisa{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card app-card p-4 p-lg-5">
+      <h1 class="h3 fw-bold mb-3">Update driver profile</h1>
+      <p class="text-muted mb-4">Keep your photo and vehicle details current so passengers can identify your trip safely.</p>
+      <form method="post" enctype="multipart/form-data" class="vstack gap-3">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Contact information</label>
+            <input class="form-control" type="text" name="contact_info" value="{{ user.contact_info or '' }}" placeholder="Phone number or WhatsApp">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Government ID</label>
+            <input class="form-control" type="text" name="government_id" value="{{ user.government_id or '' }}">
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Driver photo</label>
+          <input class="form-control" type="file" name="driver_photo" accept="image/*">
+          <div class="form-text">Upload a clear profile image. If you leave this blank, the current photo stays in place.</div>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Vehicle registration</label>
+            <input class="form-control" type="text" name="vehicle_registration" value="{{ user.vehicle_registration or '' }}" placeholder="Plate number">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Vehicle type</label>
+            <input class="form-control" type="text" name="vehicle_type" value="{{ user.vehicle_type or '' }}" placeholder="Toyota Avanza, VW Polo Vivo">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Vehicle colour</label>
+            <input class="form-control" type="text" name="vehicle_color" value="{{ user.vehicle_color or '' }}" placeholder="White, silver, black">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Vehicle details</label>
+            <input class="form-control" type="text" name="vehicle_details" value="{{ user.vehicle_details or '' }}" placeholder="Make, model, extra notes">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Save profile</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
