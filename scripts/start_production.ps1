@@ -50,4 +50,6 @@ Write-Host "  DB backend: postgres (required)" -ForegroundColor DarkGray
 Write-Host "  Redis: enabled (required)" -ForegroundColor DarkGray
 Write-Host "  Cookie secure: 1" -ForegroundColor DarkGray
 
+python scripts/production_preflight.py
+
 python -m gunicorn --workers $workers --bind "0.0.0.0:$port" --access-logfile - --error-logfile - app:app

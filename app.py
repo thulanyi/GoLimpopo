@@ -1385,6 +1385,16 @@ def index():
     return render_template("index.html", stats=stats, featured_trips=featured_trips)
 
 
+@app.route("/terms")
+def terms_of_service():
+    return render_template("legal/terms.html")
+
+
+@app.route("/privacy")
+def privacy_policy():
+    return render_template("legal/privacy.html")
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":

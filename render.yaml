@@ -1,0 +1,83 @@
+services:
+  - type: web
+    name: magayisa-web
+    runtime: python
+    plan: starter
+    autoDeploy: true
+    rootDir: .
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m gunicorn --workers ${WEB_CONCURRENCY:-4} --bind 0.0.0.0:${PORT:-8000} --access-logfile - --error-logfile - app:app
+    healthCheckPath: /healthz
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: MAGAYISA_PRODUCTION
+        value: "1"
+      - key: MAGAYISA_DEBUG
+        value: "0"
+      - key: MAGAYISA_TRUST_PROXY
+        value: "1"
+      - key: MAGAYISA_PROXY_X_FOR
+        value: "1"
+      - key: MAGAYISA_PROXY_X_PROTO
+        value: "1"
+      - key: MAGAYISA_PROXY_X_HOST
+        value: "1"
+      - key: MAGAYISA_PROXY_X_PORT
+        value: "1"
+      - key: MAGAYISA_SESSION_COOKIE_SECURE
+        value: "1"
+      - key: MAGAYISA_SESSION_SAMESITE
+        value: Lax
+      - key: MAGAYISA_BETA_MODE
+        value: "1"
+      - key: MAGAYISA_BETA_MAX_DAILY_ACTIVE_USERS
+        value: "200"
+      - key: MAGAYISA_BETA_ACTIVITY_WINDOW_SECONDS
+        value: "86400"
+      - key: PAYFAST_SANDBOX
+        value: "0"
+      - key: PAYFAST_TEST_MODE_FALLBACK
+        value: "0"
+      - key: PAYFAST_SIGN_REQUESTS
+        value: "1"
+      - key: WEB_CONCURRENCY
+        value: "4"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MAGAYISA_ADMIN_EMAIL
+        sync: false
+      - key: MAGAYISA_ADMIN_PASSWORD
+        sync: false
+      - key: MAGAYISA_PUBLIC_BASE_URL
+        sync: false
+      - key: PAYFAST_MERCHANT_ID
+        sync: false
+      - key: PAYFAST_MERCHANT_KEY
+        sync: false
+      - key: PAYFAST_PASSPHRASE
+        sync: false
+      - key: MAGAYISA_SENTRY_DSN
+        sync: false
+      - key: MAGAYISA_SENTRY_TRACES_SAMPLE_RATE
+        value: "0.1"
+      - key: MAGAYISA_POSTGRES_DSN
+        fromDatabase:
+          name: magayisa-postgres
+          property: connectionString
+      - key: MAGAYISA_REDIS_URL
+        fromService:
+          type: redis
+          name: magayisa-redis
+          property: connectionString
+
+  - type: redis
+    name: magayisa-redis
+    plan: starter
+    ipAllowList: []
+
+databases:
+  - name: magayisa-postgres
+    databaseName: magayisa
+    user: magayisa
+    plan: starter

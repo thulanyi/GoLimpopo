@@ -58,9 +58,16 @@ Use the strict production launcher (validates required env and runs gunicorn-sty
 ./scripts/start_production.ps1
 ```
 
+Preflight-only check:
+
+```powershell
+python scripts/production_preflight.py
+```
+
 Production profile template:
 
 - `.env.production.example`
+- `render.yaml` (managed web + Postgres + Redis blueprint)
 
 ## Production runtime flags
 
@@ -113,3 +120,5 @@ python app.py
 - Production environment template: `.env.production.example`
 - Monitoring guide: `docs/MONITORING_ALERTS.md`
 - Public beta runbook: `PUBLIC_BETA_RUNBOOK.md`
+- Incident response runbook: `docs/INCIDENT_RESPONSE_RUNBOOK.md`
+- Support SLA template: `docs/SUPPORT_SLA.md`

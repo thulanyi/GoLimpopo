@@ -34,6 +34,12 @@ PowerShell launcher (validates required env and starts gunicorn):
 ./scripts/start_production.ps1
 ```
 
+Preflight-only check:
+
+```powershell
+python scripts/production_preflight.py
+```
+
 Gunicorn example (Linux container/VM):
 
 ```bash
@@ -98,3 +104,21 @@ python scripts/public_beta_smoke.py --base-url https://your-beta-domain.example.
 ## 9. External infra go-live gate
 
 - Complete `docs/GO_LIVE_EXTERNAL_INFRA_CHECKLIST.md` before full public launch.
+
+## 10. Render one-click infra (web + Postgres + Redis)
+
+This repo includes `render.yaml` for managed deployment.
+
+1. In Render, create a new Blueprint deployment from this repository.
+2. Render provisions:
+	- Web service (`magayisa-web`)
+	- Managed Postgres (`magayisa-postgres`)
+	- Managed Redis (`magayisa-redis`)
+3. Set required secret env vars in Render:
+	- `MAGAYISA_ADMIN_EMAIL`
+	- `MAGAYISA_ADMIN_PASSWORD`
+	- `MAGAYISA_PUBLIC_BASE_URL`
+	- `PAYFAST_MERCHANT_ID`
+	- `PAYFAST_MERCHANT_KEY`
+	- `PAYFAST_PASSPHRASE`
+	- `MAGAYISA_SENTRY_DSN` (recommended)

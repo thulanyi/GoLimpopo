@@ -38,3 +38,7 @@ This checklist includes only external infrastructure and operations items that m
 - Terms of Service and Privacy Policy are published.
 - Incident response and on-call ownership are defined.
 - Support contact path and SLA are published for beta testers/users.
+
+Reference docs:
+- `docs/INCIDENT_RESPONSE_RUNBOOK.md`
+- `docs/SUPPORT_SLA.md`
